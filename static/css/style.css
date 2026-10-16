@@ -287,3 +287,4 @@ figure { position: relative; }
 @media (prefers-reduced-motion: reduce) { .btn-random.rolling .dice, .btn-random.nudge { animation: none; } }
 
 #real-robot .grid2 video { aspect-ratio: 8 / 7; object-fit: cover; }
+.figure.narrow img { max-width: 760px; display: block; margin: 0 auto; }
