@@ -20,6 +20,7 @@
       <p class="tagline">One RL policy learns complete humanoid pick-and-place from task rewards, with a single human demonstration used only as a motion prior.</p>
       <nav class="links">
         <a class="btn" href="#demo">Try it yourself</a>
+        <a class="btn" href="#real-robot">Real robot</a>
         <a class="btn" href="#comparison">vs. OmniContact</a>
       </nav>
     </div>
@@ -94,6 +95,22 @@
         <p class="demo-note">Object and goal stay within 3.5&nbsp;m of the robot's start.</p>
       </div>
     </section>
+
+    <section class="wrap" id="real-robot">
+      <h2>On the real robot</h2>
+      <p>A pick-up policy trained with the same reward and motion prior runs on the Unitree G1. It lifts two different boxes, and under a large downward pull it follows the box down and lifts it again. The recovery is not scripted: losing the object returns the robot to an earlier stage of the reward. For pick-and-place, a final training stage adds the G1's motor torque–speed limits, effort regularization and disturbances, and keeps 93.5% success in simulation.</p>
+      <div class="grid2 bleed" id="hardware-videos">
+        <figure>
+          <video class="lazy" data-src="videos/hw_pickup_two_boxes.mp4" poster="videos/hw_pickup_two_boxes.jpg" muted loop playsinline></video>
+          <figcaption>Two different boxes, one policy (real time).</figcaption>
+        </figure>
+        <figure>
+          <video class="lazy" data-src="videos/hw_pull_recovery.mp4" poster="videos/hw_pull_recovery.jpg" muted loop playsinline></video>
+          <figcaption>Recovery after a downward pull (real time).</figcaption>
+        </figure>
+      </div>
+    </section>
+
 
     <section class="wrap" id="abstract">
       <div class="stats">
@@ -267,26 +284,6 @@
         <video class="lazy" data-src="videos/noamp_rounds.mp4" poster="videos/noamp_rounds.jpg" muted loop playsinline></video>
         <figcaption>Without the motion prior: the task is still solved, with the motion the reward alone produces.</figcaption>
       </figure>
-    </section>
-
-    <section class="wrap" id="hardware">
-      <h2>Hardware</h2>
-      <p>The hardware stage adds the G1's motor torque–speed limits, effort regularization and disturbances of the carried object, and keeps 93.5% success in simulation.</p>
-      <figure class="single bleed">
-        <video class="lazy" data-src="videos/hardware_rounds.mp4" poster="videos/hardware_rounds.jpg" muted loop playsinline></video>
-        <figcaption>Hardware stage in simulation, with kicks and drops of the carried box.</figcaption>
-      </figure>
-      <p>On the robot, a pick-up policy trained with the same reward and motion prior lifts two different boxes. Under a large downward pull it follows the box down and lifts it again. The recovery is not scripted: losing the object returns the robot to an earlier stage of the reward.</p>
-      <div class="grid2 bleed" id="hardware-videos">
-        <figure>
-          <video class="lazy" data-src="videos/hw_pickup_two_boxes.mp4" poster="videos/hw_pickup_two_boxes.jpg" muted loop playsinline></video>
-          <figcaption>Two different boxes, one policy (real time).</figcaption>
-        </figure>
-        <figure>
-          <video class="lazy" data-src="videos/hw_pull_recovery.mp4" poster="videos/hw_pull_recovery.jpg" muted loop playsinline></video>
-          <figcaption>Recovery after a downward pull (real time).</figcaption>
-        </figure>
-      </div>
     </section>
   </main>
 

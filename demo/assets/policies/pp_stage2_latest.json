@@ -3,7 +3,7 @@
  "label": "Pick-and-place",
  "description": "Stage 2 (equal object shares, from the 32k stage-1 policy), latest checkpoint.",
  "task": "pick_place",
- "iteration": 12000,
+ "iteration": 13600,
  "control_dt": 0.02,
  "physics_dt": 0.005,
  "joints": {

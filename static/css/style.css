@@ -285,3 +285,5 @@ figure { position: relative; }
 @keyframes roll { from { transform: rotate(0deg) scale(1); } 50% { transform: rotate(200deg) scale(1.15); } to { transform: rotate(360deg) scale(1); } }
 @keyframes nudge { 0%, 100% { transform: translateY(0); } 30% { transform: translateY(-3px); } 60% { transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .btn-random.rolling .dice, .btn-random.nudge { animation: none; } }
+
+#real-robot .grid2 video { aspect-ratio: 8 / 7; object-fit: cover; }
