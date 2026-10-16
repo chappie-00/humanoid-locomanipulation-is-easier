@@ -1,0 +1,388 @@
+{
+ "nodes": [
+  {
+   "node": "g00_pelvis",
+   "body": "pelvis",
+   "rgba": [
+    0.2,
+    0.2,
+    0.2,
+    1.0
+   ]
+  },
+  {
+   "node": "g01_pelvis_contour_link",
+   "body": "pelvis",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g02_left_hip_pitch_link",
+   "body": "left_hip_pitch_link",
+   "rgba": [
+    0.2,
+    0.2,
+    0.2,
+    1.0
+   ]
+  },
+  {
+   "node": "g03_left_hip_roll_link",
+   "body": "left_hip_roll_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g04_left_hip_yaw_link",
+   "body": "left_hip_yaw_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g05_left_knee_link",
+   "body": "left_knee_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g06_left_ankle_pitch_link",
+   "body": "left_ankle_pitch_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g07_left_ankle_roll_link",
+   "body": "left_ankle_roll_link",
+   "rgba": [
+    0.2,
+    0.2,
+    0.2,
+    1.0
+   ]
+  },
+  {
+   "node": "g08_right_hip_pitch_link",
+   "body": "right_hip_pitch_link",
+   "rgba": [
+    0.2,
+    0.2,
+    0.2,
+    1.0
+   ]
+  },
+  {
+   "node": "g09_right_hip_roll_link",
+   "body": "right_hip_roll_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g10_right_hip_yaw_link",
+   "body": "right_hip_yaw_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g11_right_knee_link",
+   "body": "right_knee_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g12_right_ankle_pitch_link",
+   "body": "right_ankle_pitch_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g13_right_ankle_roll_link",
+   "body": "right_ankle_roll_link",
+   "rgba": [
+    0.2,
+    0.2,
+    0.2,
+    1.0
+   ]
+  },
+  {
+   "node": "g14_waist_yaw_link",
+   "body": "waist_yaw_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g15_waist_roll_link",
+   "body": "waist_roll_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g16_torso_link",
+   "body": "torso_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g17_logo_link",
+   "body": "torso_link",
+   "rgba": [
+    0.2,
+    0.2,
+    0.2,
+    1.0
+   ]
+  },
+  {
+   "node": "g18_head_link",
+   "body": "torso_link",
+   "rgba": [
+    0.2,
+    0.2,
+    0.2,
+    1.0
+   ]
+  },
+  {
+   "node": "g19_left_shoulder_pitch_link",
+   "body": "left_shoulder_pitch_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g20_left_shoulder_roll_link",
+   "body": "left_shoulder_roll_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g21_left_shoulder_yaw_link",
+   "body": "left_shoulder_yaw_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g22_left_elbow_link",
+   "body": "left_elbow_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g23_left_wrist_roll_link",
+   "body": "left_wrist_roll_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g24_left_wrist_pitch_link",
+   "body": "left_wrist_pitch_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g25_left_wrist_yaw_link",
+   "body": "left_wrist_yaw_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g26_left_rubber_hand",
+   "body": "left_wrist_yaw_link",
+   "rgba": [
+    0.2,
+    0.2,
+    0.2,
+    1.0
+   ]
+  },
+  {
+   "node": "g27_right_shoulder_pitch_link",
+   "body": "right_shoulder_pitch_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g28_right_shoulder_roll_link",
+   "body": "right_shoulder_roll_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g29_right_shoulder_yaw_link",
+   "body": "right_shoulder_yaw_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g30_right_elbow_link",
+   "body": "right_elbow_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g31_right_wrist_roll_link",
+   "body": "right_wrist_roll_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g32_right_wrist_pitch_link",
+   "body": "right_wrist_pitch_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g33_right_wrist_yaw_link",
+   "body": "right_wrist_yaw_link",
+   "rgba": [
+    0.7,
+    0.7,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "node": "g34_right_rubber_hand",
+   "body": "right_wrist_yaw_link",
+   "rgba": [
+    0.2,
+    0.2,
+    0.2,
+    1.0
+   ]
+  }
+ ],
+ "removed_visual_geoms": 35,
+ "bodies": [
+  "world",
+  "pelvis",
+  "left_hip_pitch_link",
+  "left_hip_roll_link",
+  "left_hip_yaw_link",
+  "left_knee_link",
+  "left_ankle_pitch_link",
+  "left_ankle_roll_link",
+  "right_hip_pitch_link",
+  "right_hip_roll_link",
+  "right_hip_yaw_link",
+  "right_knee_link",
+  "right_ankle_pitch_link",
+  "right_ankle_roll_link",
+  "waist_yaw_link",
+  "waist_roll_link",
+  "torso_link",
+  "left_shoulder_pitch_link",
+  "left_shoulder_roll_link",
+  "left_shoulder_yaw_link",
+  "left_elbow_link",
+  "left_wrist_roll_link",
+  "left_wrist_pitch_link",
+  "left_wrist_yaw_link",
+  "right_shoulder_pitch_link",
+  "right_shoulder_roll_link",
+  "right_shoulder_yaw_link",
+  "right_elbow_link",
+  "right_wrist_roll_link",
+  "right_wrist_pitch_link",
+  "right_wrist_yaw_link"
+ ]
+}

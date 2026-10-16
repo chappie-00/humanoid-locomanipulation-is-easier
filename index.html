@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rethinking RL's Role in Humanoid Loco-Manipulation</title>
+  <meta name="description" content="One RL policy learns complete humanoid pick-and-place from task rewards and a single demonstration used only as a motion prior. Anonymous project page.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='7' y='12' width='18' height='14' rx='2' fill='%23c19a6b'/%3E%3Ccircle cx='16' cy='28' r='3' fill='%23f28c28'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="static/css/style.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }
+  </script>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <h1>Rethinking RL's Role in Humanoid Loco-Manipulation</h1>
+      <p class="authors">Anonymous authors</p>
+      <p class="tagline">One RL policy learns complete humanoid pick-and-place from task rewards, with a single human demonstration used only as a motion prior.</p>
+      <nav class="links">
+        <a class="btn" href="#demo">Try it yourself</a>
+        <a class="btn" href="#comparison">vs. OmniContact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section id="demo" class="demo-section">
+      <div class="wrap">
+        <h2>Try it yourself</h2>
+        <p class="lede">The trained policies run live in your browser, in MuJoCo compiled to WebAssembly. Pick an object, drag the robot, the object or the goal, and press Run. While it runs, drag the object or the robot to push them, or move the goal.</p>
+      </div>
+      <div class="wrap wide">
+        <div class="demo">
+          <div class="demo-stage">
+            <div id="viewer" class="viewer"></div>
+            <div class="hud">
+              <span id="hud-phase" class="phase">Loading…</span>
+              <span id="hud-time" class="time">0.0 s</span>
+            </div>
+            <div class="help">
+              <span class="setup-only">Drag to move · drag a ring to turn · </span>
+              <span class="run-only">Drag the object or robot to push · </span>
+              <span>drag empty space to orbit · scroll to zoom</span>
+            </div>
+            <div id="demo-loading" class="loading">
+              <div class="bar"><span></span></div>
+              <p>Waiting to load…</p>
+            </div>
+          </div>
+          <aside class="panel">
+            <button id="btn-random" class="btn-random" type="button">
+              <svg class="dice" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.2" cy="8.2" r="1.6" fill="currentColor"/><circle cx="15.8" cy="8.2" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="8.2" cy="15.8" r="1.6" fill="currentColor"/><circle cx="15.8" cy="15.8" r="1.6" fill="currentColor"/></svg>
+              <span>Try a random scene</span>
+            </button>
+            <div class="ctl">
+              <span class="ctl-label">Task</span>
+              <div class="seg">
+                <button data-task="pick_place" class="on">Pick &amp; place</button>
+                <button data-task="pick_up">Pick up</button>
+              </div>
+            </div>
+            <div class="ctl">
+              <span class="ctl-label">Object</span>
+              <div id="object-chips" class="chips"></div>
+            </div>
+            <div class="ctl" id="box-controls">
+              <div class="slider"><span>Length</span><input type="range" id="box-w" min="12" max="70" step="1"><output id="box-w-val"></output></div>
+              <div class="slider"><span>Width</span><input type="range" id="box-d" min="12" max="70" step="1"><output id="box-d-val"></output></div>
+              <div class="slider"><span>Height</span><input type="range" id="box-h" min="12" max="70" step="1"><output id="box-h-val"></output></div>
+            </div>
+            <div class="ctl" id="variant-controls" hidden>
+              <div class="slider"><span>Size</span><input type="range" id="variant" min="0" max="15" step="1"><output id="variant-val"></output></div>
+            </div>
+            <div class="ctl">
+              <div class="slider"><span>Mass</span><input type="range" id="mass" min="-3" max="2.08" step="0.01"><output id="mass-val"></output></div>
+              <p class="hint warn" id="range-note" hidden>Outside the training range: expect failures.</p>
+            </div>
+            <div class="ctl buttons">
+              <button id="btn-run" class="btn primary">Run</button>
+              <button id="btn-reset" class="btn">Reset</button>
+            </div>
+            <div class="ctl row">
+              <div class="seg small">
+                <button data-speed="0.5">½×</button>
+                <button data-speed="1" class="on">1×</button>
+                <button data-speed="2">2×</button>
+              </div>
+              <label class="check"><input type="checkbox" id="follow" checked> Follow robot</label>
+            </div>
+          </aside>
+        </div>
+        <p class="demo-note">Object and goal stay within 3.5&nbsp;m of the robot's start.</p>
+      </div>
+    </section>
+
+    <section class="wrap" id="abstract">
+      <div class="stats">
+        <div class="stat"><span class="num oc">65.3%</span><span class="lbl">OmniContact<br><small>reference tracking, hours of mocap</small></span></div>
+        <div class="stat"><span class="num task">91.5%</span><span class="lbl">Ours, box-only<br><small>trained on boxes only</small></span></div>
+        <div class="stat"><span class="num cov">95.4%</span><span class="lbl">Ours + coverage<br><small>wider simulation, same reward and clip</small></span></div>
+      </div>
+      <p class="stats-note">Pick-and-place success on 504 shared scenarios with boxes up to 6&nbsp;kg.</p>
+      <h2>Abstract</h2>
+      <p>Many recent humanoid loco-manipulation works mostly use reinforcement learning (RL) to track motion references, since rewards for long-horizon, contact-rich tasks are hard to design and explore. Each new object or placement then needs more motion capture, retargeting, or planning. We ask whether RL can instead learn a complete loco-manipulation task from task rewards, outperform current state-of-the-art works, and extend to other object types without per-object rewards or tuning. An object-agnostic staged reward built from contacts and geometry specifies pick-and-place, one human–object clip serves only as a motion prior, and randomized simulation supplies the variation. On 504 shared scenarios with boxes up to 6&nbsp;kg, the policy trained only on boxes succeeds in 91.5% of episodes, and in 83.5% of those outside its training range in object size, mass, and distance, against 65.3% and 45.4% for OmniContact, a reference-tracking system trained on hours of motion capture. It also picks up object families it has never seen, and widening the simulated distribution, without new demonstrations or reward changes, raises success to 95.4% on boxes and 77.7% on other objects. The same formulation trains policies for hardware pickup. RL can thus act as the task learner, shifting the design burden from collecting reference motions to specifying task objectives.</p>
+    </section>
+
+
+
+
+    <section class="wrap" id="method">
+      <h2>Method</h2>
+      <figure class="figure">
+        <img src="static/img/pipeline_visual.png" alt="(a) Learning: randomized simulation feeds a staged task reward (a staircase over approach, grasp, carry, place and release) and one human clip trains a motion-prior discriminator; task and style critics are mixed 0.9 to 0.1 in PPO for one policy that runs without a reference. (b) Training stages: task (boxes), coverage (+ objects), hardware (+ disturbances)." loading="lazy">
+      </figure>
+      <div class="cols">
+        <div>
+          <h3>A staged progress reward</h3>
+          <p>The task is split into six stages, <em>approach, grasp, carry, place, release, placed</em>, read from the scene at every step. The reward is a staircase over the stages with a dense ramp inside each one, so dropping the object simply sends the robot back down the staircase. Every stage is defined from contacts and geometry, so the same reward covers boxes, balls, household objects and chairs without grasp points or per-object tuning.</p>
+        </div>
+        <div>
+          <h3>One clip as a motion prior</h3>
+          <p>The only demonstration is one human clip of lifting, carrying and setting down a box, retargeted to the G1. Adversarial discriminators judge how the robot and the object move, never a trajectory to follow, and a separate critic keeps this style signal at 10% of the update: the prior shapes how the robot moves without deciding what it does.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="comparison">
+      <h2>Comparison with OmniContact</h2>
+      <p>OmniContact executes planned contact flows with a tracking policy trained on hours of motion capture. We run its released policy in its own MuJoCo setup on 504 shared scenarios: nominal placements plus sweeps over size, mass, shape, distance and goal placement, 194 of them outside our box-only training range. An episode succeeds if the object is carried and released at rest within 0.35&nbsp;m of the goal, without a fall.</p>
+      <div class="cols results">
+        <div>
+          <table class="table">
+            <caption>Success on the 504 scenarios. Inside / outside: the box-only training range. + Coverage: mean of three seeds. *Zero-shot.</caption>
+            <thead><tr><th></th><th class="oc">OmniContact</th><th class="task">Box-only</th><th class="cov">+ Coverage</th></tr></thead>
+            <tbody>
+              <tr class="headline"><td>Success, all 504 (%)</td><td>65.3</td><td>91.5</td><td><b>95.4</b></td></tr>
+              <tr class="indent"><td>inside range, 310 (%)</td><td>77.7</td><td>96.5</td><td><b>99.9</b></td></tr>
+              <tr class="indent"><td>outside range, 194 (%)</td><td>45.4</td><td>83.5</td><td><b>88.1</b></td></tr>
+              <tr><td>Lifted (%)</td><td>92.1</td><td>94.0</td><td><b>96.2</b></td></tr>
+              <tr><td>Failed after lifting (episodes)</td><td>135</td><td>13</td><td><b>4.0</b></td></tr>
+              <tr><td>Falls (episodes)</td><td>69</td><td>31</td><td><b>3.3</b></td></tr>
+              <tr><td>Other object families (%)</td><td>–</td><td>56.4*</td><td><b>77.7</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="insight">
+          <h3>The gap opens after the lift</h3>
+          <p>Both systems lift the object in over 92% of episodes, but OmniContact then fails in 135 of them and falls in 69, against 13 and 31 for our box-only policy. The difference comes while carrying, setting down and releasing the object.</p>
+          <h3>Beyond the training range</h3>
+          <p>Outside its training range the box-only policy still succeeds in 83.5% of scenarios, against 45.4%. OmniContact never lifts the 55&nbsp;cm cube and completes none of the 12 or 50&nbsp;cm cubes.</p>
+        </div>
+      </div>
+      <figure class="figure">
+        <img src="static/img/evaluation_sweeps.png" alt="(a) Success inside and outside the box-only training range; (b-d) success as cube edge, mass and approach distance vary; (e) object families zero-shot and after coverage; for OmniContact, ours box-only and ours plus coverage." loading="lazy">
+        <figcaption>(a) Success inside and outside the box-only training range. (b–d) Sweeps over cube edge, mass and approach distance; shaded: box-only training range. (e) Other object families, zero-shot and after coverage.</figcaption>
+      </figure>
+      <div id="head-to-head">
+        <h3 class="gallery-title">Same scenario: OmniContact fails, ours succeeds</h3>
+        <p>Ours (box-only) on the left, OmniContact on the right, in the same physics.</p>
+        <div class="h2h">
+        <div class="h2h-bars">
+          <div class="bar-row">
+            <span class="bar-label">OmniContact</span>
+            <div class="bar" id="bar-oc"></div>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Ours, box-only</span>
+            <div class="bar" id="bar-boxonly"></div>
+          </div>
+          <div class="bar-legend" id="bar-legend"></div>
+          <p class="hint">Episode outcomes on the 504 scenarios.</p>
+        </div>
+        </div>
+      <!-- H2H_DATA:start --><script type="application/json" id="h2h-data">{"modes": {"fell": [{"src": "videos/vs_oc_boxonly/01_standard_box_fell.mp4", "poster": "videos/vs_oc_boxonly/01_standard_box_fell.jpg", "title": "Standard box, goal 1.2 m to the robot's left", "ours": "placed at 2.4 s", "oc": "fell at 10.5 s", "caption": "The standard box with the goal to the robot's left: ours places it in 2.4 s; OmniContact sets it down on the goal but then falls at 10.5 s.", "tag": "", "speed": 1}, {"src": "videos/vs_oc_boxonly/07_box_behind_fell.mp4", "poster": "videos/vs_oc_boxonly/07_box_behind_fell.jpg", "title": "Box behind the robot, to its left", "ours": "placed at 1.8 s", "oc": "fell at 11.7 s", "caption": "With the box behind the robot, ours turns, picks it up and places it in 1.8 s; OmniContact brings it to the goal but falls at 11.7 s.", "tag": "", "speed": 1}, {"src": "videos/vs_oc_boxonly/02_goal_3m_fell.mp4", "poster": "videos/vs_oc_boxonly/02_goal_3m_fell.jpg", "title": "Goal 3 m away", "ours": "placed at 2.8 s", "oc": "fell at 10.2 s", "caption": "Carrying the box to a goal 3 m away: ours places it in 2.8 s; OmniContact gets there but falls at 10.2 s, right as it lets go of the box.", "tag": "", "speed": 1}], "never": [{"src": "videos/vs_oc_boxonly/11_wide_box_never_lifted.mp4", "poster": "videos/vs_oc_boxonly/11_wide_box_never_lifted.jpg", "title": "Wide box: 70 × 40 × 30 cm", "ours": "placed at 2.1 s", "oc": "never lifted the box", "caption": "A wide 70 × 40 × 30 cm box: ours places it in 2.1 s; OmniContact never gets it off the floor in the 25 s episode.", "tag": "", "speed": 2}, {"src": "videos/vs_oc_boxonly/04_cube55_never_lifted.mp4", "poster": "videos/vs_oc_boxonly/04_cube55_never_lifted.jpg", "title": "Large box: 55 cm cube, 1 kg", "ours": "placed at 3.2 s", "oc": "never lifted the box", "caption": "A large 55 cm cube: ours (+ coverage) lifts and places it in 3.2 s; OmniContact never gets it off the floor in the 25 s episode.", "tag": "+ coverage", "speed": 2}], "holding": [{"src": "videos/vs_oc_boxonly/05_flat_box_still_holding.mp4", "poster": "videos/vs_oc_boxonly/05_flat_box_still_holding.jpg", "title": "Flat box: 50 × 50 × 20 cm", "ours": "placed at 5.5 s", "oc": "still holding at the end", "caption": "A flat 50 × 50 × 20 cm box: ours places it in 5.5 s; OmniContact picks it up late and is still holding it when the 25 s episode ends.", "tag": "", "speed": 2}, {"src": "videos/vs_oc_boxonly/06_box_5m_still_holding.mp4", "poster": "videos/vs_oc_boxonly/06_box_5m_still_holding.jpg", "title": "Box 5 m away", "ours": "placed at 6.9 s", "oc": "still holding at the end", "caption": "The box starts 5 m away: ours walks over, carries it back and places it in 6.9 s; OmniContact brings it back but is still holding it when the 25 s episode ends.", "tag": "", "speed": 2}, {"src": "videos/vs_oc_boxonly/12_box_directly_behind_still_holding.mp4", "poster": "videos/vs_oc_boxonly/12_box_directly_behind_still_holding.jpg", "title": "Box directly behind the robot", "ours": "placed at 2.0 s", "oc": "still holding at the end", "caption": "With the box directly behind the robot, ours turns, picks it up and places it in 2.0 s; OmniContact picks it up but is still holding it when the 25 s episode ends.", "tag": "", "speed": 2}], "drop": [{"src": "videos/vs_oc_boxonly/03_cube12_dropped.mp4", "poster": "videos/vs_oc_boxonly/03_cube12_dropped.jpg", "title": "Small box: 12 cm cube, 1 kg", "ours": "placed at 5.0 s", "oc": "dropped the box 1.9 m from the goal", "caption": "A small 12 cm cube: ours places it in 5.0 s; OmniContact drops it on the way, 1.9 m from the goal.", "tag": "", "speed": 1}, {"src": "videos/vs_oc_boxonly/08_goal_behind_dropped.mp4", "poster": "videos/vs_oc_boxonly/08_goal_behind_dropped.jpg", "title": "Goal behind the robot", "ours": "placed at 2.5 s", "oc": "dropped the box 1.1 m from the goal", "caption": "With the goal behind the robot, ours turns around with the box and places it in 2.5 s; OmniContact drops it 1.1 m from the goal.", "tag": "", "speed": 1}, {"src": "videos/vs_oc_boxonly/10_box_4m_dropped.mp4", "poster": "videos/vs_oc_boxonly/10_box_4m_dropped.jpg", "title": "Box 4 m away", "ours": "placed at 9.7 s", "oc": "dropped the box 3.2 m from the goal", "caption": "The box starts 4 m away: ours carries it back and places it in 9.7 s; OmniContact drops it soon after picking it up, 3.2 m from the goal.", "tag": "", "speed": 1}, {"src": "videos/vs_oc_boxonly/09_heavy_6kg_set_down_off_goal.mp4", "poster": "videos/vs_oc_boxonly/09_heavy_6kg_set_down_off_goal.jpg", "title": "Heavy box: 6 kg", "ours": "placed at 2.1 s", "oc": "set it down 1.1 m from the goal", "caption": "A 6 kg box: ours places it in 2.1 s; OmniContact struggles to lift it and finally sets it down 1.1 m from the goal.", "tag": "", "speed": 2}]}, "outcomes": {"oc": [["success", 329], ["fell", 69], ["never", 38], ["holding", 35], ["drop", 27], ["other", 6]], "boxonly": [["success", 461], ["fell", 31], ["never", 12], ["holding", 0], ["drop", 0], ["other", 0]], "ours": [["success", 484], ["fell", 4], ["never", 15], ["holding", 1], ["drop", 0], ["other", 0]]}}</script><!-- H2H_DATA:end -->
+      </div>
+      <div class="carousel bleed">
+      <button class="car-btn prev" aria-label="Previous clips">‹</button>
+      <div class="gallery" id="vs-gallery">
+        <!-- VS_GALLERY:start -->
+        <figure>
+          <video class="lazy" data-src="videos/vs_oc_boxonly/01_standard_box_fell.mp4" poster="videos/vs_oc_boxonly/01_standard_box_fell.jpg" muted loop playsinline preload="none"></video>
+          <p class="clip-title">Standard box, goal 1.2 m to the robot&#x27;s left</p>
+          <p class="outcomes"><span class="ok">Ours: ✓ placed at 2.4 s</span><span class="fail">OmniContact: ✗ fell at 10.5 s</span><span class="muted"></span></p>
+        </figure>
+        <figure>
+          <video class="lazy" data-src="videos/vs_oc_boxonly/07_box_behind_fell.mp4" poster="videos/vs_oc_boxonly/07_box_behind_fell.jpg" muted loop playsinline preload="none"></video>
+          <p class="clip-title">Box behind the robot, to its left</p>
+          <p class="outcomes"><span class="ok">Ours: ✓ placed at 1.8 s</span><span class="fail">OmniContact: ✗ fell at 11.7 s</span><span class="muted"></span></p>
+        </figure>
+        <figure>
+          <video class="lazy" data-src="videos/vs_oc_boxonly/02_goal_3m_fell.mp4" poster="videos/vs_oc_boxonly/02_goal_3m_fell.jpg" muted loop playsinline preload="none"></video>
+          <p class="clip-title">Goal 3 m away</p>
+          <p class="outcomes"><span class="ok">Ours: ✓ placed at 2.8 s</span><span class="fail">OmniContact: ✗ fell at 10.2 s</span><span class="muted"></span></p>
+        </figure>
+        <figure>
+          <video class="lazy" data-src="videos/vs_oc_boxonly/11_wide_box_never_lifted.mp4" poster="videos/vs_oc_boxonly/11_wide_box_never_lifted.jpg" muted loop playsinline preload="none"></video>
+          <p class="clip-title">Wide box: 70 × 40 × 30 cm</p>
+          <p class="outcomes"><span class="ok">Ours: ✓ placed at 2.1 s</span><span class="fail">OmniContact: ✗ never lifted the box</span><span class="muted">2× speed</span></p>
+        </figure>
+        <figure>
+          <video class="lazy" data-src="videos/vs_oc_boxonly/04_cube55_never_lifted.mp4" poster="videos/vs_oc_boxonly/04_cube55_never_lifted.jpg" muted loop playsinline preload="none"></video>
+          <p class="clip-title">Large box: 55 cm cube, 1 kg <span class="tag">+ coverage</span></p>
+          <p class="outcomes"><span class="ok">Ours: ✓ placed at 3.2 s</span><span class="fail">OmniContact: ✗ never lifted the box</span><span class="muted">2× speed</span></p>
+        </figure>
+        <figure>
+          <video class="lazy" data-src="videos/vs_oc_boxonly/05_flat_box_still_holding.mp4" poster="videos/vs_oc_boxonly/05_flat_box_still_holding.jpg" muted loop playsinline preload="none"></video>
+          <p class="clip-title">Flat box: 50 × 50 × 20 cm</p>
+          <p class="outcomes"><span class="ok">Ours: ✓ placed at 5.5 s</span><span class="fail">OmniContact: ✗ still holding at the end</span><span class="muted">2× speed</span></p>
+        </figure>
+        <figure>
+          <video class="lazy" data-src="videos/vs_oc_boxonly/06_box_5m_still_holding.mp4" poster="videos/vs_oc_boxonly/06_box_5m_still_holding.jpg" muted loop playsinline preload="none"></video>
+          <p class="clip-title">Box 5 m away</p>
+          <p class="outcomes"><span class="ok">Ours: ✓ placed at 6.9 s</span><span class="fail">OmniContact: ✗ still holding at the end</span><span class="muted">2× speed</span></p>
+        </figure>
+        <figure>
+          <video class="lazy" data-src="videos/vs_oc_boxonly/12_box_directly_behind_still_holding.mp4" poster="videos/vs_oc_boxonly/12_box_directly_behind_still_holding.jpg" muted loop playsinline preload="none"></video>
+          <p class="clip-title">Box directly behind the robot</p>
+          <p class="outcomes"><span class="ok">Ours: ✓ placed at 2.0 s</span><span class="fail">OmniContact: ✗ still holding at the end</span><span class="muted">2× speed</span></p>
+        </figure>
+        <figure>
+          <video class="lazy" data-src="videos/vs_oc_boxonly/03_cube12_dropped.mp4" poster="videos/vs_oc_boxonly/03_cube12_dropped.jpg" muted loop playsinline preload="none"></video>
+          <p class="clip-title">Small box: 12 cm cube, 1 kg</p>
+          <p class="outcomes"><span class="ok">Ours: ✓ placed at 5.0 s</span><span class="fail">OmniContact: ✗ dropped the box 1.9 m from the goal</span><span class="muted"></span></p>
+        </figure>
+        <figure>
+          <video class="lazy" data-src="videos/vs_oc_boxonly/08_goal_behind_dropped.mp4" poster="videos/vs_oc_boxonly/08_goal_behind_dropped.jpg" muted loop playsinline preload="none"></video>
+          <p class="clip-title">Goal behind the robot</p>
+          <p class="outcomes"><span class="ok">Ours: ✓ placed at 2.5 s</span><span class="fail">OmniContact: ✗ dropped the box 1.1 m from the goal</span><span class="muted"></span></p>
+        </figure>
+        <figure>
+          <video class="lazy" data-src="videos/vs_oc_boxonly/10_box_4m_dropped.mp4" poster="videos/vs_oc_boxonly/10_box_4m_dropped.jpg" muted loop playsinline preload="none"></video>
+          <p class="clip-title">Box 4 m away</p>
+          <p class="outcomes"><span class="ok">Ours: ✓ placed at 9.7 s</span><span class="fail">OmniContact: ✗ dropped the box 3.2 m from the goal</span><span class="muted"></span></p>
+        </figure>
+        <figure>
+          <video class="lazy" data-src="videos/vs_oc_boxonly/09_heavy_6kg_set_down_off_goal.mp4" poster="videos/vs_oc_boxonly/09_heavy_6kg_set_down_off_goal.jpg" muted loop playsinline preload="none"></video>
+          <p class="clip-title">Heavy box: 6 kg</p>
+          <p class="outcomes"><span class="ok">Ours: ✓ placed at 2.1 s</span><span class="fail">OmniContact: ✗ set it down 1.1 m from the goal</span><span class="muted">2× speed</span></p>
+        </figure>
+        <!-- VS_GALLERY:end -->
+      </div>
+      <button class="car-btn next" aria-label="More clips">›</button>
+      <p class="car-count" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="wrap" id="coverage">
+      <h2>Coverage grows with simulation, not with data</h2>
+      <p>Trained on boxes alone, the policy already completes 56.4% of episodes with balls, household objects and chairs it has never seen. Widening the simulation to include them, with the same reward and no new demonstrations, raises this to 77.7%, and success on the comparison scenarios to 95.4%.</p>
+      <figure class="single bleed">
+        <video class="lazy" data-src="videos/teaser_objects.mp4" poster="videos/teaser_objects.jpg" muted loop playsinline></video>
+        <figcaption>Coverage stage: boxes, balls and a chair at random placements and goals; three independent episodes per round, unedited.</figcaption>
+      </figure>
+    </section>
+
+    <section class="wrap" id="ablations">
+      <h2>What learning needs</h2>
+      <div class="cards3">
+        <div class="card"><b>Stage floors only</b><span class="big">0%</span><p>Rewarded only for reaching the next stage, the policy never lifts the object.</p></div>
+        <div class="card"><b>No walking guidance</b><span class="big">0%</span><p>Lifts the object in 89.5% of episodes but never delivers it.</p></div>
+        <div class="card"><b>No motion prior</b><span class="big">89.9%</span><p>Same success, but it learns the task about 1,000 iterations later.</p></div>
+      </div>
+      <p>Dense progress and walking guidance carry the learning; the one-clip prior mainly speeds it up.</p>
+      <figure class="single bleed">
+        <video class="lazy" data-src="videos/noamp_rounds.mp4" poster="videos/noamp_rounds.jpg" muted loop playsinline></video>
+        <figcaption>Without the motion prior: the task is still solved, with the motion the reward alone produces.</figcaption>
+      </figure>
+    </section>
+
+    <section class="wrap" id="hardware">
+      <h2>Hardware</h2>
+      <p>The hardware stage adds the G1's motor torque–speed limits, effort regularization and disturbances of the carried object, and keeps 93.5% success in simulation.</p>
+      <figure class="single bleed">
+        <video class="lazy" data-src="videos/hardware_rounds.mp4" poster="videos/hardware_rounds.jpg" muted loop playsinline></video>
+        <figcaption>Hardware stage in simulation, with kicks and drops of the carried box.</figcaption>
+      </figure>
+      <p>On the robot, a pick-up policy trained with the same reward and motion prior lifts two different boxes. Under a large downward pull it follows the box down and lifts it again. The recovery is not scripted: losing the object returns the robot to an earlier stage of the reward.</p>
+      <div class="grid2 bleed" id="hardware-videos">
+        <figure>
+          <video class="lazy" data-src="videos/hw_pickup_two_boxes.mp4" poster="videos/hw_pickup_two_boxes.jpg" muted loop playsinline></video>
+          <figcaption>Two different boxes, one policy (real time).</figcaption>
+        </figure>
+        <figure>
+          <video class="lazy" data-src="videos/hw_pull_recovery.mp4" poster="videos/hw_pull_recovery.jpg" muted loop playsinline></video>
+          <figcaption>Recovery after a downward pull (real time).</figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <p>Anonymous project page for double-blind review.</p>
+  </footer>
+
+  <script type="module" src="static/js/main.js"></script>
+  <script type="module" src="demo/app.js"></script>
+</body>
+</html>
