@@ -230,7 +230,7 @@ pre { background: var(--bg-alt); border: 1px solid var(--line); border-radius: v
 }
 
 /* minimal beige ---------------------------------------------------------------------- */
-.tagline { max-width: 680px; margin: -6px auto 20px; color: var(--ink-soft); font: 400 18px/1.5 var(--serif); }
+.tagline { max-width: 680px; margin: 4px auto 22px; color: var(--ink-soft); font: 400 18px/1.5 var(--serif); }
 .venue { letter-spacing: 0.14em; }
 .btn { background: transparent; border-color: var(--line); }
 .btn:hover { border-color: var(--ink); }
